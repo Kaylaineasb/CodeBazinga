@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "CodeBazinga - Aprenda Programando",
+    "slug": "codeBazinga-rn",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0f0f1e"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.codeBazinga.rn"
+    },
+    "android": {
+      "package": "com.codeBazinga.rn",
+      "adaptiveIcon": {
+        "backgroundColor": "#0f0f1e"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
