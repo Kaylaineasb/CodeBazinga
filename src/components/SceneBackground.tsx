@@ -19,10 +19,6 @@ export default function SceneBackground({ theme }: Props) {
 
   return (
     <View style={styles.backgroundContainer} pointerEvents="none">
-      {/* Usamos viewBox="0 0 400 200" (proporção 2:1, ideal para modo horizontal).
-        O preserveAspectRatio="xMidYMax slice" garante que o SVG corte as laterais 
-        mas fique SEMPRE colado no fundo (Y máximo) da tela.
-      */}
       <Svg 
         width="100%" 
         height="120%" 
@@ -39,7 +35,7 @@ export default function SceneBackground({ theme }: Props) {
         {/* 1. Céu de Fundo */}
         <Rect x="0" y="0" width="400" height="220" fill="url(#sky)" />
 
-        {/* 2. Sol / lua visível no topo direito */}
+        {/* 2. Sol / lua  */}
         <Circle cx="340" cy="40" r="18" fill="#ffe066" opacity={0.95} />
 
         {theme === 'floresta' && (
@@ -88,7 +84,7 @@ export default function SceneBackground({ theme }: Props) {
 
 const styles = StyleSheet.create({
   backgroundContainer: {
-    ...StyleSheet.absoluteFillObject, // Garante que a View preencha 100% da tela fisicamente
+    ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
 });

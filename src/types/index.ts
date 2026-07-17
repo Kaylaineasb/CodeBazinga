@@ -1,13 +1,10 @@
-// Tipos que descrevem a estrutura narrativa do jogo.
-// Cada capítulo é um grafo de nós (nodes) conectados por "next".
-
 export type SceneTheme = 'floresta' | 'cidade' | 'torre' | 'caverna';
 
 export interface DialogueNode {
   id: string;
   type: 'dialogue';
-  speaker: string; // nome de quem fala ('Você', 'Mestre Byte', etc.)
-  avatar: string; // emoji usado como avatar
+  speaker: string;
+  avatar: string;
   text: string;
   next: string;
 }

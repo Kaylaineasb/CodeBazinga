@@ -78,7 +78,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         return { ...prev, xp: newXp, level: levelForXp(newXp) };
       });
     }
-    // O nó de desafio sempre avança após a resposta (o feedback é mostrado antes de avançar).
     advanceTo(next);
   }
 

@@ -25,7 +25,6 @@ export default function CodeChallenge({ node, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      {/* Coluna da Esquerda: Enunciado e Código */}
       <View style={styles.leftColumn}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>⚔ DESAFIO · {node.concept}</Text>
@@ -37,31 +36,27 @@ export default function CodeChallenge({ node, onComplete }: Props) {
 
         {node.code && (
           <View style={styles.codeBox}>
-            {/* Scroll Vertical Principal com barra persistente */}
             <ScrollView 
               showsVerticalScrollIndicator={true}
-              persistentScrollbar={true} // Força a barra a ficar visível no Android
+              persistentScrollbar={true}
               nestedScrollEnabled={true}
               contentContainerStyle={styles.verticalScrollContent}
             >
-              {/* Scroll Horizontal */}
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={true}
-                persistentScrollbar={true} // Força a barra horizontal no Android
+                persistentScrollbar={true}
                 contentContainerStyle={styles.horizontalScrollContent}
               >
                 <Text style={styles.codeText}>{node.code}</Text>
               </ScrollView>
             </ScrollView>
             
-            {/* Indicador visual discreto estilo RPG no cantinho da caixa */}
             <Text style={styles.scrollIndicatorHint}>↕ ↔</Text>
           </View>
         )}
       </View>
 
-      {/* Coluna da Direita: Opções ou Caixa de Feedback */}
       <View style={styles.rightColumn}>
         {!answered ? (
           <View style={styles.optionsGrid}>
@@ -113,7 +108,7 @@ const styles = StyleSheet.create({
     borderColor: '#ffb703',
     padding: 12,
     gap: 16,
-    maxHeight: 180, // Mantém o teto seguro para continuar mostrando o cenário
+    maxHeight: 180,
     alignItems: 'center',
   },
   leftColumn: {
@@ -162,7 +157,7 @@ const styles = StyleSheet.create({
     borderColor: '#4361ee',
     borderBottomWidth: 4,
     borderBottomColor: '#1d2d44',
-    width: '48%', // Alinhamento perfeito em 2x2
+    width: '48%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -211,16 +206,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 6,
     borderWidth: 1,
-    borderColor: '#3d5a80', // Uma cor um pouco mais clara para destacar a existência da caixa
+    borderColor: '#3d5a80',
     flex: 1,
     maxHeight: 95,
-    position: 'relative', // Permite posicionar a dica absoluta lá dentro
+    position: 'relative',
   },
   verticalScrollContent: {
-    paddingRight: 8, // Garante que a barra de rolagem não fique colada em cima do texto do código
+    paddingRight: 8,
   },
   horizontalScrollContent: {
-    paddingBottom: 8, // Dá espaço para a barra horizontal respirar sem cobrir a última linha
+    paddingBottom: 8,
   },
   codeText: {
     color: '#7ee787',
@@ -232,7 +227,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 2,
     right: 4,
-    color: 'rgba(255, 183, 3, 0.4)', // Amarelo bem suave/transparente para não atrapalhar a leitura
+    color: 'rgba(255, 183, 3, 0.4)',
     fontSize: 9,
     fontWeight: '800',
     fontFamily: 'monospace',
