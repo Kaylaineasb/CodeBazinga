@@ -5,23 +5,20 @@ import { GameProvider, useGame } from './src/engine/GameContext';
 import MenuScreen from './src/screens/MenuScreen';
 import GameScreen from './src/screens/GameScreen';
 import ChapterCompleteScreen from './src/screens/ChapterCompleteScreen';
-import VictoryScreen from './src/screens/VictoryScreen';
 
 function Router() {
-  const { screen } = useGame();
+  const { currentNode, loading } = useGame();
+  if (loading) return null; 
 
-  switch (screen) {
-    case 'menu':
-      return <MenuScreen />;
-    case 'game':
-      return <GameScreen />;
-    case 'chapterComplete':
-      return <ChapterCompleteScreen />;
-    case 'victory':
-      return <VictoryScreen />;
-    default:
-      return <MenuScreen />;
+  if (currentNode?.type === 'end') {
+    return <ChapterCompleteScreen />;
   }
+
+  if (currentNode) {
+    return <GameScreen />;
+  }
+
+  return <MenuScreen />;
 }
 
 export default function App() {

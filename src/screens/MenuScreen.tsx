@@ -10,18 +10,21 @@ import { useGame } from '../engine/GameContext';
 import SceneBackground from '../components/SceneBackground';
 
 export default function MenuScreen() {
-  const { startNewGame } = useGame();
+  const { startNewGame } = useGame(); 
 
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       
-      <View style={styles.backgroundContainer}>
+      {/* 
+        pointerEvents="none" garante que o Android/iOS ignorem toques nessa View, 
+        fazendo o clique passar direto para os botões da frente!
+      */}
+      <View style={styles.backgroundContainer} pointerEvents="none">
         <SceneBackground theme="floresta" />
       </View>
 
       <View style={styles.overlay}>
-        
         <View style={styles.brandContainer}>
           <Text style={styles.title}>CodeBazinga</Text>
           <Text style={styles.subtitle}>
@@ -38,7 +41,6 @@ export default function MenuScreen() {
         >
           <Text style={styles.buttonText}>▶ Iniciar Jornada</Text>
         </Pressable>
-
       </View>
     </View>
   );
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 0,
+    zIndex: -1,
   },
   overlay: {
     flex: 1,

@@ -1,119 +1,117 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
-import { chapters, getChapterById, getNextChapter } from '../data/story';
-import { Chapter, PlayerProgress, StoryNode } from '../types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PlayerProgress, GameContextType } from '../types';
+import { chapters } from '../data/story';
 
-type Screen = 'menu' | 'game' | 'chapterComplete' | 'victory';
+const STORAGE_KEY = '@codequest:progress';
 
-interface GameContextValue {
-  screen: Screen;
-  progress: PlayerProgress;
-  currentChapter: Chapter | undefined;
-  currentNode: StoryNode | undefined;
-  startNewGame: () => void;
-  goToMenu: () => void;
-  advanceTo: (nodeId: string) => void;
-  answerChallenge: (correct: boolean, xpReward: number, next: string) => void;
-  continueAfterChapter: () => void;
-  allChapters: Chapter[];
-}
+const GameContext = createContext<GameContextType | undefined>(undefined);
 
-const GameContext = createContext<GameContextValue | undefined>(undefined);
-
-const initialProgress: PlayerProgress = {
+const INITIAL_PROGRESS: PlayerProgress = {
   xp: 0,
   level: 1,
   completedChapters: [],
-  currentChapterId: chapters[0].id,
-  currentNodeId: chapters[0].startNode,
+  currentChapterId: 'cap1',
+  currentNodeId: 'c1_n1',
 };
 
-function levelForXp(xp: number): number {
-  return Math.floor(xp / 100) + 1;
-}
+export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [progress, setProgress] = useState<PlayerProgress>(INITIAL_PROGRESS);
+  const [loading, setLoading] = useState<boolean>(true);
 
-export function GameProvider({ children }: { children: React.ReactNode }) {
-  const [screen, setScreen] = useState<Screen>('menu');
-  const [progress, setProgress] = useState<PlayerProgress>(initialProgress);
-
-  const currentChapter = useMemo(
-    () => getChapterById(progress.currentChapterId),
-    [progress.currentChapterId]
-  );
-
-  const currentNode = useMemo(
-    () => currentChapter?.nodes[progress.currentNodeId],
-    [currentChapter, progress.currentNodeId]
-  );
-
-  function startNewGame() {
-    setProgress(initialProgress);
-    setScreen('game');
-  }
-
-  function goToMenu() {
-    setScreen('menu');
-  }
-
-  function advanceTo(nodeId: string) {
-    if (!currentChapter) return;
-    const node = currentChapter.nodes[nodeId];
-    if (node?.type === 'end') {
-      setProgress((prev) => ({
-        ...prev,
-        currentNodeId: nodeId,
-        completedChapters: prev.completedChapters.includes(currentChapter.id)
-          ? prev.completedChapters
-          : [...prev.completedChapters, currentChapter.id],
-      }));
-      setScreen('chapterComplete');
-      return;
+  useEffect(() => {
+    async function loadSavedProgress() {
+      try {
+        const savedData = await AsyncStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+          setProgress(JSON.parse(savedData));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar o progresso do CodeBazinga:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-    setProgress((prev) => ({ ...prev, currentNodeId: nodeId }));
-  }
+    loadSavedProgress();
+  }, []);
 
-  function answerChallenge(correct: boolean, xpReward: number, next: string) {
-    if (correct) {
-      setProgress((prev) => {
-        const newXp = prev.xp + xpReward;
-        return { ...prev, xp: newXp, level: levelForXp(newXp) };
-      });
-    }
-    advanceTo(next);
-  }
-
-  function continueAfterChapter() {
-    if (!currentChapter) return;
-    const next = getNextChapter(currentChapter.id);
-    if (next) {
-      setProgress((prev) => ({
-        ...prev,
-        currentChapterId: next.id,
-        currentNodeId: next.startNode,
-      }));
-      setScreen('game');
-    } else {
-      setScreen('victory');
+  async function saveProgress(newProgress: PlayerProgress) {
+    try {
+      setProgress(newProgress);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newProgress));
+    } catch (error) {
+      console.error('Erro ao salvar o progresso do CodeBazinga:', error);
     }
   }
 
-  const value: GameContextValue = {
-    screen,
-    progress,
-    currentChapter,
-    currentNode,
-    startNewGame,
-    goToMenu,
-    advanceTo,
-    answerChallenge,
-    continueAfterChapter,
-    allChapters: chapters,
+  const startNewGame = () => {
+    saveProgress(INITIAL_PROGRESS);
   };
 
-  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
-}
+  const advanceTo = (nextNodeId: string) => {
+    const updated: PlayerProgress = {
+      ...progress,
+      currentNodeId: nextNodeId,
+    };
+    saveProgress(updated);
+  };
 
-export function useGame(): GameContextValue {
-  const ctx = useContext(GameContext);
-  if (!ctx) throw new Error('useGame precisa ser usado dentro de um <GameProvider>');
-  return ctx;
-}
+  const answerChallenge = (correct: boolean, xpReward: number, nextNodeId: string) => {
+    if (!correct) {
+      advanceTo(nextNodeId);
+      return;
+    }
+
+    let newXp = progress.xp + xpReward;
+    let newLevel = progress.level;
+
+    if (newXp >= 100) {
+      newLevel += 1;
+      newXp = newXp - 100;
+    }
+
+    const updated: PlayerProgress = {
+      ...progress,
+      xp: newXp,
+      level: newLevel,
+      currentNodeId: nextNodeId,
+    };
+
+    saveProgress(updated);
+  };
+
+  const resetGame = async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      setProgress(INITIAL_PROGRESS);
+    } catch (error) {
+      console.error('Erro ao resetar o progresso:', error);
+    }
+  };
+
+  const currentChapter = chapters.find(c => c.id === progress.currentChapterId) || null;
+  const currentNode = currentChapter ? currentChapter.nodes[progress.currentNodeId] : null;
+
+  return (
+    <GameContext.Provider
+      value={{
+        currentChapter,
+        currentNode,
+        progress,
+        loading,
+        startNewGame,
+        advanceTo,
+        answerChallenge,
+        resetGame,
+      }}
+    >
+      {children}
+    </GameContext.Provider>
+  );
+};
+
+export const useGame = () => {
+  const context = useContext(GameContext);
+  if (!context) throw new Error('useGame deve ser usado dentro de um GameProvider');
+  return context;
+};

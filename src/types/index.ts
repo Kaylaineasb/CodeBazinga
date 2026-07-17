@@ -31,11 +31,11 @@ export interface ChallengeOption {
 export interface ChallengeNode {
   id: string;
   type: 'challenge';
-  concept: string; // ex: "Variáveis"
+  concept: string;
   prompt: string;
-  code?: string; // trecho de código exibido em fonte monoespaçada
+  code?: string;
   options: ChallengeOption[];
-  explanation: string; // exibida após a resposta
+  explanation: string;
   xpReward: number;
   next: string;
 }
@@ -64,4 +64,15 @@ export interface PlayerProgress {
   completedChapters: string[];
   currentChapterId: string;
   currentNodeId: string;
+}
+
+export interface GameContextType {
+  currentChapter: Chapter | null;
+  currentNode: StoryNode | null;
+  progress: PlayerProgress;
+  loading: boolean;
+  startNewGame: () => void;
+  advanceTo: (nextNodeId: string) => void;
+  answerChallenge: (correct: boolean, xpReward: number, nextNodeId: string) => void;
+  resetGame: () => Promise<void>;
 }
