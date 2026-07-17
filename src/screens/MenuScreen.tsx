@@ -14,15 +14,12 @@ export default function MenuScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Esconde a status bar nativa para o jogo ocupar 100% da tela física */}
       <StatusBar hidden />
       
-      {/* Background absoluto com zIndex garantido atrás do conteúdo */}
       <View style={styles.backgroundContainer}>
         <SceneBackground theme="floresta" />
       </View>
 
-      {/* Overlay que centraliza o título e o botão de forma nativa e leve */}
       <View style={styles.overlay}>
         
         <View style={styles.brandContainer}>
@@ -58,12 +55,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 0, // Força o background a ficar na camada de trás
+    zIndex: 0,
   },
   overlay: {
     flex: 1,
-    justifyContent: 'center', // Centraliza na vertical
-    alignItems: 'center',     // Centraliza na horizontal
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 24,
     gap: 32,
     zIndex: 1,
@@ -90,7 +87,7 @@ const styles = StyleSheet.create({
     textShadowColor: '#000',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
-    maxWidth: 380, // Evita que o texto se espalhe demasiado nas laterais no landscape
+    maxWidth: 380,
   },
   button: {
     backgroundColor: '#1b4332',

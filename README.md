@@ -1,4 +1,4 @@
-# CodeQuest 🎮 — Aprenda Programação Através da Narrativa
+# CodeBazinga 🎮 — Aprenda Programação Através da Narrativa
 
 Protótipo de jogo 2D em **React Native (Expo)** que ensina conceitos de programação
 (variáveis, condicionais e loops) através de uma história interativa com diálogos,
@@ -26,7 +26,7 @@ escolhas e desafios de código no estilo RPG.
 ## Estrutura do projeto
 
 ```
-CodeQuestRN/
+CodeBazinga/
 ├── App.tsx                        # Ponto de entrada, roteia as telas
 ├── src/
 │   ├── types/index.ts             # Tipos do motor narrativo

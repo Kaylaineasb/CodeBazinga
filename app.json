@@ -3,7 +3,7 @@
     "name": "CodeBazinga - Aprenda Programando",
     "slug": "codeBazinga-rn",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "userInterfaceStyle": "dark",
     "splash": {
       "backgroundColor": "#0f0f1e"

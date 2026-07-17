@@ -1,5 +1,6 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '../engine/GameContext';
 import SceneBackground from '../components/SceneBackground';
 import DialogueBox from '../components/DialogueBox';
@@ -13,11 +14,9 @@ export default function GameScreen() {
   if (!currentChapter || !currentNode) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <SceneBackground theme={currentChapter.theme} />
-
       <StatusBar chapterTitle={currentChapter.title} level={progress.level} xp={progress.xp} />
-
       <View style={styles.content}>
         {currentNode.type === 'dialogue' && (
           <DialogueBox
@@ -47,13 +46,14 @@ export default function GameScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#000' 
+  },
   content: {
     flex: 1,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-    padding: 16,
+    justifyContent: 'flex-end', 
+    paddingHorizontal: 32, 
+    paddingBottom: 16, 
   },
 });

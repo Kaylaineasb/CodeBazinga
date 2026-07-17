@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, Pressable, View, ScrollView } from 'react-native';
 import { ChallengeNode } from '../types';
 
 interface Props {
@@ -25,90 +25,202 @@ export default function CodeChallenge({ node, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>⚔ DESAFIO · {node.concept}</Text>
-      </View>
-
-      <Text style={styles.prompt}>{node.prompt}</Text>
-
-      {node.code && (
-        <View style={styles.codeBox}>
-          <Text style={styles.codeText}>{node.code}</Text>
+      {/* Coluna da Esquerda: Enunciado e Código */}
+      <View style={styles.leftColumn}>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>⚔ DESAFIO · {node.concept}</Text>
         </View>
-      )}
 
-      <View style={styles.options}>
-        {node.options.map((opt, idx) => {
-          const isSelected = selected === idx;
-          const showCorrect = answered && opt.correct;
-          const showWrong = answered && isSelected && !opt.correct;
-          return (
-            <TouchableOpacity
-              key={idx}
-              disabled={answered}
-              onPress={() => handleSelect(idx)}
-              activeOpacity={0.8}
-              style={[
-                styles.optionButton,
-                showCorrect && styles.optionCorrect,
-                showWrong && styles.optionWrong,
-              ]}
+        <Text style={styles.prompt} numberOfLines={2} adjustsFontSizeToFit>
+          {node.prompt}
+        </Text>
+
+        {node.code && (
+          <View style={styles.codeBox}>
+            {/* Scroll Vertical Principal com barra persistente */}
+            <ScrollView 
+              showsVerticalScrollIndicator={true}
+              persistentScrollbar={true} // Força a barra a ficar visível no Android
+              nestedScrollEnabled={true}
+              contentContainerStyle={styles.verticalScrollContent}
             >
-              <Text style={styles.optionText}>{opt.text}</Text>
-            </TouchableOpacity>
-          );
-        })}
+              {/* Scroll Horizontal */}
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={true}
+                persistentScrollbar={true} // Força a barra horizontal no Android
+                contentContainerStyle={styles.horizontalScrollContent}
+              >
+                <Text style={styles.codeText}>{node.code}</Text>
+              </ScrollView>
+            </ScrollView>
+            
+            {/* Indicador visual discreto estilo RPG no cantinho da caixa */}
+            <Text style={styles.scrollIndicatorHint}>↕ ↔</Text>
+          </View>
+        )}
       </View>
 
-      {answered && (
-        <View style={styles.feedbackBox}>
-          <Text style={styles.feedbackTitle}>
-            {isCorrectSelection ? `✅ Correto! +${node.xpReward} XP` : '❌ Não foi dessa vez.'}
-          </Text>
-          <Text style={styles.feedbackText}>{node.explanation}</Text>
-          <TouchableOpacity style={styles.continueButton} onPress={handleContinue} activeOpacity={0.85}>
-            <Text style={styles.continueText}>Continuar ▸</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Coluna da Direita: Opções ou Caixa de Feedback */}
+      <View style={styles.rightColumn}>
+        {!answered ? (
+          <View style={styles.optionsGrid}>
+            {node.options.map((opt, idx) => (
+              <Pressable
+                key={idx}
+                disabled={answered}
+                onPress={() => handleSelect(idx)}
+                style={({ pressed }) => [
+                  styles.optionButton,
+                  pressed && styles.buttonPressed,
+                ]}
+              >
+                <Text style={styles.optionText}>{opt.text}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.feedbackBox}>
+            <Text style={styles.feedbackTitle}>
+              {isCorrectSelection ? `✅ Correto! +${node.xpReward} XP` : '❌ Não foi dessa vez.'}
+            </Text>
+            <Text style={styles.feedbackText} numberOfLines={3} adjustsFontSizeToFit>
+              {node.explanation}
+            </Text>
+            
+            <Pressable 
+              style={({ pressed }) => [
+                styles.continueButton,
+                pressed && styles.buttonPressed
+              ]} 
+              onPress={handleContinue}
+            >
+              <Text style={styles.continueText}>Continuar ▸</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(15, 15, 30, 0.95)',
-    borderRadius: 14,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(12, 21, 17, 0.92)',
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: '#ffb703',
-    padding: 10,
+    padding: 12,
+    gap: 16,
+    maxHeight: 180, // Mantém o teto seguro para continuar mostrando o cenário
+    alignItems: 'center',
+  },
+  leftColumn: {
+    flex: 1.2,
+    height: '100%',
+    justifyContent: 'center',
+  },
+  rightColumn: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'center',
   },
   badge: {
     alignSelf: 'flex-start',
     backgroundColor: '#ffb703',
-    borderRadius: 6,
-    paddingHorizontal: 8,
+    borderRadius: 5,
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   badgeText: {
     color: '#1a1a1a',
-    fontWeight: '700',
-    fontSize: 11,
+    fontWeight: '800',
+    fontSize: 10,
+    textTransform: 'uppercase',
   },
   prompt: {
     color: '#f1f1f1',
-    fontSize: 13,
-    lineHeight: 17,
-    marginBottom: 6,
+    fontSize: 12,
+    lineHeight: 15,
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  optionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    justifyContent: 'center',
+  },
+  optionButton: {
+    backgroundColor: '#293e5c',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: '#4361ee',
+    borderBottomWidth: 4,
+    borderBottomColor: '#1d2d44',
+    width: '48%', // Alinhamento perfeito em 2x2
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonPressed: {
+    borderBottomWidth: 1,
+    marginTop: 3,
+  },
+  optionText: {
+    color: '#e0e1dd',
+    fontSize: 11,
+    fontFamily: 'monospace',
+    textAlign: 'center',
+  },
+  feedbackBox: {
+    height: '100%',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  feedbackTitle: {
+    color: '#ffe066',
+    fontWeight: '800',
+    fontSize: 12,
+    textTransform: 'uppercase',
+  },
+  feedbackText: {
+    color: '#c9c9d3',
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  continueButton: {
+    backgroundColor: '#4361ee',
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#2b3da5',
+  },
+  continueText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 12,
+    textTransform: 'uppercase',
   },
   codeBox: {
     backgroundColor: '#0d0d17',
     borderRadius: 8,
-    padding: 7,
-    marginBottom: 7,
+    padding: 6,
     borderWidth: 1,
-    borderColor: '#2a2a3d',
+    borderColor: '#3d5a80', // Uma cor um pouco mais clara para destacar a existência da caixa
+    flex: 1,
+    maxHeight: 95,
+    position: 'relative', // Permite posicionar a dica absoluta lá dentro
+  },
+  verticalScrollContent: {
+    paddingRight: 8, // Garante que a barra de rolagem não fique colada em cima do texto do código
+  },
+  horizontalScrollContent: {
+    paddingBottom: 8, // Dá espaço para a barra horizontal respirar sem cobrir a última linha
   },
   codeText: {
     color: '#7ee787',
@@ -116,57 +228,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 15,
   },
-  options: {
-    gap: 8,
-  },
-  optionButton: {
-    backgroundColor: '#293e5c',
-    borderRadius: 8,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#4361ee',
-    marginBottom: 5,
-  },
-  optionCorrect: {
-    backgroundColor: '#1b4332',
-    borderColor: '#40916c',
-  },
-  optionWrong: {
-    backgroundColor: '#4a0e0e',
-    borderColor: '#c1121f',
-  },
-  optionText: {
-    color: '#e0e1dd',
-    fontSize: 12,
+  scrollIndicatorHint: {
+    position: 'absolute',
+    bottom: 2,
+    right: 4,
+    color: 'rgba(255, 183, 3, 0.4)', // Amarelo bem suave/transparente para não atrapalhar a leitura
+    fontSize: 9,
+    fontWeight: '800',
     fontFamily: 'monospace',
-  },
-  feedbackBox: {
-    marginTop: 4,
-    borderTopWidth: 1,
-    borderTopColor: '#2a2a3d',
-    paddingTop: 6,
-  },
-  feedbackTitle: {
-    color: '#ffe066',
-    fontWeight: '700',
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  feedbackText: {
-    color: '#c9c9d3',
-    fontSize: 11,
-    lineHeight: 15,
-    marginBottom: 6,
-  },
-  continueButton: {
-    backgroundColor: '#4361ee',
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  continueText: {
-    color: '#fff',
-    fontWeight: '700',
   },
 });
